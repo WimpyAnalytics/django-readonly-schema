@@ -55,3 +55,16 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# PyCharm
+.idea
+
+# Virtualenv
+venv
+
+# Secrets
+_secrets.py
+
+# sqllite DBs
+*.sqlite3
+!legacy-db.sqlite3

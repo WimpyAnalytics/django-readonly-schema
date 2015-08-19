@@ -16,9 +16,8 @@ from pynt import task
 
 SETTINGS_ROOT = os.path.join(paths.project_paths.manage_root, 'readonly/settings')
 SUPERVISOR_CONF = os.path.join(SETTINGS_ROOT, 'supervisor.conf')
-SECRETS = os.path.join(SETTINGS_ROOT, '_secrets.py')
-SECRETS_TEMPLATE = os.path.join(SETTINGS_ROOT, '_secrets.template.ini')
 STATIC_ROOT = os.path.join(project.project_paths.root, 'static')
+DEPLOY_EXTRAS_DIR = os.path.join(project.project_paths.root, 'deploy_extras')
 
 
 @task()
@@ -26,9 +25,6 @@ def runserver():
     """Runs the server using gunicorn"""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "readonly.settings.local")
     with safe_cd(paths.project_paths.manage_root):
-        if not os.path.exists(SECRETS):
-            shutil.copy(SECRETS_TEMPLATE, SECRETS)
-
         project.venv_execute(
            'gunicorn',
            '--reload',
@@ -39,17 +35,22 @@ def runserver():
 
 
 @task(create_venv)
-def create_deb():
+def create_deb(environment='demo'):
     """Creates a deb using the present vevnv"""
     version = '0.0.1'
     name = 'django-readonly'
+    suffix = environment
     project.execute(
         'fpm', '-s', 'dir', '-t', 'deb', '-n', name, '-v', version, '-d', 'python,python-dev,supervisor',
-        '{source}={target}'.format(source=project.project_paths.manage_root, target='/srv/django-readonly/readonly'),
-        '{source}={target}'.format(source=project.project_paths.venv, target='/srv/django-readonly/venv'),
-        '{source}={target}'.format(source=STATIC_ROOT, target='/srv/django-readonly/static'),
-        '{source}={target}'.format(source=SUPERVISOR_CONF, target='/etc/supervisor/conf.d/{}'.format(name)),
+        '-S', suffix, '--template-scripts',
+        '--after-install', os.path.join(DEPLOY_EXTRAS_DIR, 'after-install.sh'),
+        '--before-upgrade', os.path.join(DEPLOY_EXTRAS_DIR, 'before-upgrade.sh'),
+        '--after-upgrade', os.path.join(DEPLOY_EXTRAS_DIR, 'after-upgrade.sh'),
+        '{source}/={target}/'.format(source=project.project_paths.manage_root, target='/srv/django-readonly/readonly'),
+        '{source}/={target}/'.format(source=project.project_paths.venv, target='/srv/django-readonly/venv'),
+        '{source}/={target}/'.format(source=STATIC_ROOT, target='/srv/django-readonly/static'),
+        '{source}={target}'.format(source=SUPERVISOR_CONF, target='/etc/supervisor/conf.d/{}.conf'.format(name)),
     )
-    print('This deb can now be installed on a Ubuntu 12.04 with gdebi.')
-    print('> sudo apt-get install gdebi (one time only)')
-    print('> sudo gdebi django-readonly_{}_amd64.deb'.format(version))
+    print('This deb can now be installed on a Ubuntu 12.04 server. But requires gdebi to be installed form local file.')
+    print('(on server, one time) sudo apt-get update && apt-get install gdebi')
+    print('(on server) sudo gdebi django-readonly_{}_amd64.deb'.format(version))

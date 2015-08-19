@@ -1,4 +1,4 @@
-"""Production settings and globals."""
+"""Demo settings and globals."""
 
 from base import *
 

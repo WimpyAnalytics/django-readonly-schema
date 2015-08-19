@@ -10,19 +10,11 @@ MODULE_ROOT = os.path.dirname(os.path.abspath(__file__))
 CONFIG_APP_ROOT = os.path.dirname(MODULE_ROOT)
 MANAGE_ROOT = os.path.dirname(CONFIG_APP_ROOT)
 REPO_ROOT = os.path.dirname(MANAGE_ROOT)
-SECRETS_MODULE = '_secrets'  # This file is *not* sourced.
 STATIC_ROOT = os.path.join(REPO_ROOT, 'static')
 
 # Site name:
 SITE_NAME = os.path.basename(MANAGE_ROOT)
 
-# Obtaining secrets
-try:
-    from . import _secrets
-except ImportError:
-    raise ImportError('Could not import _secrets module. Please create it by using _secrets.template.py as a template.')
-
-_version = None
 ENVIRONMENT = os.environ.get('DJANGO_SETTINGS_MODULE').replace('readonly.settings.', '')
 
 # Add our project to our pythonpath, this way we don't need to type our project
@@ -60,8 +52,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(MANAGE_ROOT, 'legacy-db.sqlite3'),
         # If we had needed credentials
-        #'USER': _secrets.db_read_username,
-        #'PASSWORD': _secrets.db_read_password,
+        #'USER': os.environ.get('LEGACY_DB_USER', 'local user'),
+        #'PASSWORD': os.environ.get('LEGACY_DB_PASSWORD', 'local password'),
     },
 }
 
@@ -102,7 +94,7 @@ DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 """ SECRET CONFIGURATION """
-SECRET_KEY = _secrets.secret_key
+SECRET_KEY = os.environ.get('READONLY_SECRET_KEY', '(default) set this for security')
 
 """ SITE CONFIGURATION """
 # Hosts/domain names that are valid for this site
@@ -189,6 +181,13 @@ LOGGING = {
         'console':{
             'level': 'INFO',
             'class': 'logging.StreamHandler'
+        },
+        'var_log':{
+            'level': 'INFO',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': '/var/log/django-readonly/site.log',
+            'maxBytes': 10485760,  # 10mb per rotation
+            'backupCount': 50,  # 500mb in retention
         },
     },
     'loggers': {

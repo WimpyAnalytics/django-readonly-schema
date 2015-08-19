@@ -71,3 +71,9 @@ _secrets.py
 
 # Django
 static
+
+# Vagrant
+.vagrant
+
+# Installer
+*.deb

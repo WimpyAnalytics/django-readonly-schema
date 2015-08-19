@@ -1,5 +1,5 @@
-# legacy-readonly-schema
-An example of a Django 1.6+ project using a database with a readonly or fixed schema. (No migration table allowed)
+# django-readonly-schema
+An example of a Django 1.8 project using a database with a readonly or fixed schema. (No migration table allowed)
 
 ## Setup
 If you want to see it work. A build tool can be used for easy project setup.

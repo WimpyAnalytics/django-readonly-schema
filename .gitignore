@@ -68,3 +68,6 @@ _secrets.py
 # sqllite DBs
 *.sqlite3
 !legacy-db.sqlite3
+
+# Django
+static

@@ -99,7 +99,6 @@ STATICFILES_FINDERS = (
 )
 
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 """ SECRET CONFIGURATION """
@@ -108,7 +107,7 @@ SECRET_KEY = _secrets.secret_key
 """ SITE CONFIGURATION """
 # Hosts/domain names that are valid for this site
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []  # TODO: Add the DNS name(s) to be used.
 
 """ FIXTURE CONFIGURATION """
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-FIXTURE_DIRS

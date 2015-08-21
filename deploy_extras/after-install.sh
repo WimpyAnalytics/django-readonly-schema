@@ -7,16 +7,13 @@ adduser --system --no-create-home django-readonly
 chown -R django-readonly /srv/django-readonly
 mkdir -p /var/log/django-readonly
 chown -R django-readonly /var/log/django-readonly
-supervisorctl reread
-supervisorctl update
 
 # Some post-install help
-echo "Please set permanent environment variables for each of the following sensitive settings."
+echo "You should have set permanent environment variables for each of the following sensitive settings."
 echo "> LEGACY_DB_USER"
 echo "> LEGACY_DB_PASSWORD"
 echo "> DJANGO_SETTINGS_MODULE (Environment specific settings to use readonly.settings.<your environment>)"
 echo "> READONLY_SECRET_KEY (A long random string, used for encryption.)"
-echo "Then restart the server."
-echo "e.g. sudo supervisorctl restart django-readonly"
+echo "If not, please set them and restart the server."
 echo "The logs can be found at /var/log/django-readonly"
 echo "Enjoy!"
